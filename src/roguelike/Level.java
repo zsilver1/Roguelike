@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 public class Level {
     private Tile[][] tiles;
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
     private LinkedList<Creature> creatureList;
     private Player player;
 
@@ -14,7 +14,8 @@ public class Level {
         this.height = height;
         this.creatureList = new LinkedList<>();
 
-        LevelGenerator gen = new LevelGenerator(width, height);
+        //LevelGenerator gen = new BasicLevelGenerator(width, height);
+        LevelGenerator gen = new RoomLevelGenerator(width, height);
         this.tiles = gen.generate();
         this.player = new Player(this, gen.getStartingPlayerX(), gen.getStartingPlayerY());
     }

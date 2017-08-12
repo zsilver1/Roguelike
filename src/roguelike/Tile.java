@@ -67,6 +67,14 @@ public class Tile {
         return background;
     }
 
+    public void setType(Tile.Type newType) {
+        this.type = newType;
+        this.curChar = this.type.getChar();
+        this.foreground = this.type.getForeground();
+        this.background = this.type.getBackground();
+        this.walkable = this.type.getWalkable();
+    }
+
     public boolean isWalkable() {
         return walkable;
     }
