@@ -22,6 +22,7 @@ public class Tile {
     private Type type;
     private Color foreground;
     private Color background;
+    private boolean walkable;
     private float illumination;
     private Creature creature;
 
@@ -35,6 +36,9 @@ public class Tile {
         this.y = y;
         this.type = type;
         this.curChar = this.type.getChar();
+        this.foreground = this.type.getForeground();
+        this.background = this.type.getBackground();
+        this.walkable = this.type.getWalkable();
     }
 
     public char getChar() {
@@ -44,34 +48,63 @@ public class Tile {
     public void setCreature(Creature creature) {
         this.creature = creature;
         this.curChar = creature.getCharacter();
+        this.foreground = creature.getForeground();
+        this.background = creature.getBackground();
     }
 
-    public void removeCreature(Creature creature) {
+    public void removeCreature() {
         this.creature = null;
         this.curChar = this.type.getChar();
+        this.foreground = this.type.getForeground();
+        this.background = this.type.getBackground();
     }
 
+    public Color getForeground() {
+        return foreground;
+    }
+
+    public Color getBackground() {
+        return background;
+    }
+
+    public boolean isWalkable() {
+        return walkable;
+    }
 
 
     /**
      * An enum representing tile types.
      */
     public enum Type {
-        FLOOR('.'),
-        WALL('#');
+        FLOOR('.', AsciiPanel.brightBlack, AsciiPanel.black, true),
+        WALL('#', AsciiPanel.yellow, AsciiPanel.black, false);
 
         private char c;
         private Color foreground;
         private Color background;
+        private Boolean walkable;
 
-        Type(char c, Color foreground, Color background) {
+        Type(char c, Color foreground, Color background, boolean walkable) {
             this.c = c;
             this.foreground = foreground;
             this.background = background;
+            this.walkable = walkable;
         }
 
         public char getChar() {
             return this.c;
+        }
+
+        public Color getBackground() {
+            return background;
+        }
+
+        public Color getForeground() {
+            return foreground;
+        }
+
+        public Boolean getWalkable() {
+            return walkable;
         }
     }
 }

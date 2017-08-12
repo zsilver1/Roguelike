@@ -16,7 +16,11 @@ public class LevelGenerator {
     public Tile[][] generate() {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                this.tiles[x][y] = new Tile(x, y, Tile.Type.FLOOR);
+                if (x == 0 || x == this.width - 1 || y == 0 || y == this.height - 1) {
+                    this.tiles[x][y] = new Tile(x, y, Tile.Type.WALL);
+                } else {
+                    this.tiles[x][y] = new Tile(x, y, Tile.Type.FLOOR);
+                }
             }
         }
         this.startingPlayerX = 50;

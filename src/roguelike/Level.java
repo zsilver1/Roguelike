@@ -20,7 +20,11 @@ public class Level {
     }
 
     public Tile getTile(int x, int y) {
-        return this.tiles[x][y];
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            return this.tiles[x][y];
+        } else {
+            throw new IndexOutOfBoundsException("Invalid tile");
+        }
     }
 
     public int getWidth() {
@@ -29,5 +33,9 @@ public class Level {
 
     public int getHeight() {
         return height;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }

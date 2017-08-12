@@ -14,8 +14,7 @@ public class StartScreen implements Screen {
 
     @Override
     public void displayOutput(AsciiPanel terminal) {
-        terminal.write("rl tutorial", 1, 1);
-        terminal.writeCenter("-- press [enter] to start --", 22);
+        terminal.writeCenter("-- press [enter] to start --", this.height / 2);
     }
 
     @Override

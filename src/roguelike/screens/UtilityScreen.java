@@ -53,7 +53,7 @@ public class UtilityScreen implements Screen {
             if (this.lines[y] == null) {
                 terminal.write(' ', 0, y);
             } else {
-                terminal.write(this.lines[y], 0, y, AsciiPanel.brightBlue);
+                terminal.write(this.lines[y], 0, y, AsciiPanel.brightCyan);
             }
             terminal.write('|', this.width - 1, y, AsciiPanel.red);
         }
