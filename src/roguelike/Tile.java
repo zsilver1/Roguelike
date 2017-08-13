@@ -31,7 +31,7 @@ public class Tile {
      * @param x x location
      * @param y y location
      */
-    Tile(int x, int y, Tile.Type type) {
+    public Tile(int x, int y, Tile.Type type) {
         this.x = x;
         this.y = y;
         this.type = type;
@@ -65,6 +65,10 @@ public class Tile {
 
     public Color getBackground() {
         return background;
+    }
+
+    public Type getType() {
+        return this.type;
     }
 
     public void setType(Tile.Type newType) {

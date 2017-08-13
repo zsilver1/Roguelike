@@ -14,8 +14,8 @@ public class Main extends JFrame implements KeyListener {
 
     // represent the terminal width and height, given to
     // every screen as initialization input
-    private static final int WIDTH = 100;
-    private static final int HEIGHT = 35;
+    private static final int WIDTH = 175;
+    private static final int HEIGHT = 55;
 
     private Main() {
         super();

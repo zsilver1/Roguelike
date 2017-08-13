@@ -1,5 +1,8 @@
 package roguelike;
 
+import roguelike.generators.CaveGenerator;
+import roguelike.generators.LevelGenerator;
+
 import java.util.LinkedList;
 
 public class Level {
@@ -15,7 +18,7 @@ public class Level {
         this.creatureList = new LinkedList<>();
 
         //LevelGenerator gen = new BasicLevelGenerator(width, height);
-        LevelGenerator gen = new RoomLevelGenerator(width, height);
+        LevelGenerator gen = new CaveGenerator(width, height);
         this.tiles = gen.generate();
         this.player = new Player(this, gen.getStartingPlayerX(), gen.getStartingPlayerY());
     }
