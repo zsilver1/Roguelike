@@ -1,11 +1,9 @@
 package roguelike.generators;
 
+import roguelike.LightSource;
 import roguelike.Tile;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 public class CaveGenerator extends LevelGenerator {
 
@@ -32,8 +30,14 @@ public class CaveGenerator extends LevelGenerator {
         for (int i = 0; i < 3; i++) {
             this.secondStep();
         }
+
+        if (this.floodFill()) {
+            this.fillMapWith(Tile.Type.FLOOR);
+            return this.generate();
+        }
         this.clearSingleWalls();
 
+        this.placeLights(25);
         this.placePlayer();
         return this.tiles;
     }
@@ -47,6 +51,21 @@ public class CaveGenerator extends LevelGenerator {
         }
         this.startingPlayerX = startX;
         this.startingPlayerY = startY;
+    }
+
+    private void placeLights(int numLights) {
+        for (int i = 0; i < numLights; i++) {
+            int x = this.random.nextInt(this.width);
+            int y = this.random.nextInt(this.height);
+            int neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
+            while (this.tiles[x][y].getType() != Tile.Type.FLOOR ||
+                    neighbors < 2 || neighbors > 5) {
+                x = this.random.nextInt(this.width);
+                y = this.random.nextInt(this.height);
+                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
+            }
+            this.tiles[x][y].setLightSource(new LightSource());
+        }
     }
 
     private void fillWithWallsAtProb(int prob) {
@@ -68,27 +87,6 @@ public class CaveGenerator extends LevelGenerator {
         }
     }
 
-    private void secondStep() {
-        int neighbors;
-        Tile[][] newTiles = new Tile[this.width][this.height];
-        for (int x = 0; x < this.width; x++) {
-            for (int y = 0; y < this.height; y++) {
-                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getType());
-            }
-        }
-        for (int x = 1; x < this.width - 1; x++) {
-            for (int y = 1; y < this.height - 1; y++) {
-                neighbors = this.numNeighboringWalls(x, y, 1);
-                if (neighbors >= 5){
-                    newTiles[x][y].setType(Tile.Type.WALL);
-                } else {
-                    newTiles[x][y].setType(Tile.Type.FLOOR);
-                }
-            }
-        }
-        this.tiles = newTiles;
-    }
-
     private void firstStep() {
         int neighbors;
         int neighbors2;
@@ -100,9 +98,30 @@ public class CaveGenerator extends LevelGenerator {
         }
         for (int x = 1; x < this.width - 1; x++) {
             for (int y = 1; y < this.height - 1; y++) {
-                neighbors = this.numNeighboringWalls(x, y, 1);
-                neighbors2 = this.numNeighboringWalls(x, y, 2);
+                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
+                neighbors2 = this.numNeighboring(x, y, 2, Tile.Type.WALL);
                 if (neighbors >= 5 || neighbors2 <= 3){
+                    newTiles[x][y].setType(Tile.Type.WALL);
+                } else {
+                    newTiles[x][y].setType(Tile.Type.FLOOR);
+                }
+            }
+        }
+        this.tiles = newTiles;
+    }
+
+    private void secondStep() {
+        int neighbors;
+        Tile[][] newTiles = new Tile[this.width][this.height];
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getType());
+            }
+        }
+        for (int x = 1; x < this.width - 1; x++) {
+            for (int y = 1; y < this.height - 1; y++) {
+                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
+                if (neighbors >= 5){
                     newTiles[x][y].setType(Tile.Type.WALL);
                 } else {
                     newTiles[x][y].setType(Tile.Type.FLOOR);
@@ -115,38 +134,62 @@ public class CaveGenerator extends LevelGenerator {
     private void clearSingleWalls() {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (this.numNeighboringWalls(x, y, 1) == 1) {
+                if (this.numNeighboring(x, y, 1, Tile.Type.WALL) == 1) {
                     this.tiles[x][y].setType(Tile.Type.FLOOR);
                 }
             }
         }
     }
 
-    private int numNeighboringWalls(int x, int y, int within) {
-        int number = 0;
-        int startX = 0;
-        int startY = 0;
-        int endX = this.width;
-        int endY = this.height;
-        if (x - within >= 0) {
-            startX = x - within;
+    // returns true if world should be regenerated
+    private boolean floodFill() {
+        int startX = this.random.nextInt(this.width);
+        int startY = this.random.nextInt(this.height);
+        while (this.tiles[startX][startY].getType() == Tile.Type.WALL) {
+            startX = this.random.nextInt(this.width);
+            startY = this.random.nextInt(this.height);
         }
-        if (y - within >= 0) {
-            startY = y - within;
+        float area = this.width * this.height;
+        int numVisited = this.visit(startX, startY);
+        float frac = numVisited / area;
+        if (frac < 0.3 || frac > 0.6) {
+            return true;
         }
-        if (x + within < this.width) {
-            endX = x + within + 1;
-        }
-        if (y + within < this.height) {
-            endY = y + within + 1;
-        }
-        for (int xi = startX; xi < endX; xi++) {
-            for (int yi = startY; yi < endY; yi++) {
-                if (this.tiles[xi][yi].getType() == Tile.Type.WALL) {
-                    number++;
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                if (!this.tiles[x][y].marked) {
+                    this.tiles[x][y].setType(Tile.Type.WALL);
                 }
             }
         }
-        return number;
+        return false;
+    }
+
+    private int visit(int x, int y) {
+        Stack<Tile> s = new Stack<>();
+        s.push(this.tiles[x][y]);
+        Tile t;
+        int numVisited = 0;
+        while (!s.empty()) {
+            t = s.pop();
+            if (t.marked) {
+                continue;
+            }
+            t.marked = true;
+            numVisited++;
+            if (this.tiles[t.x-1][t.y].getType() != Tile.Type.WALL) {
+                s.push(this.tiles[t.x-1][t.y]);
+            }
+            if (this.tiles[t.x+1][t.y].getType() != Tile.Type.WALL) {
+                s.push(this.tiles[t.x+1][t.y]);
+            }
+            if (this.tiles[t.x][t.y-1].getType() != Tile.Type.WALL) {
+                s.push(this.tiles[t.x][t.y-1]);
+            }
+            if (this.tiles[t.x][t.y+1].getType() != Tile.Type.WALL) {
+                s.push(this.tiles[t.x][t.y+1]);
+            }
+        }
+        return numVisited;
     }
 }

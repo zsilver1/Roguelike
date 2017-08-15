@@ -17,14 +17,22 @@ public class Tile {
      */
     public final int y;
 
+    /**
+     * Used for various algorithms.
+     */
+    public boolean marked;
+
     // Used for actual char value of tile, in case of creature or object
     private char curChar;
     private Type type;
     private Color foreground;
     private Color background;
     private boolean walkable;
+    private boolean transparent;
+    private boolean explored;
     private float illumination;
     private Creature creature;
+    private LightSource lightSource;
 
     /**
      * Create a new tile.
@@ -39,10 +47,15 @@ public class Tile {
         this.foreground = this.type.getForeground();
         this.background = this.type.getBackground();
         this.walkable = this.type.getWalkable();
+        this.transparent = this.type.getTransparent();
     }
 
     public char getChar() {
         return this.curChar;
+    }
+
+    public Creature getCreature() {
+        return creature;
     }
 
     public void setCreature(Creature creature) {
@@ -80,7 +93,37 @@ public class Tile {
     }
 
     public boolean isWalkable() {
-        return walkable;
+        return this.walkable;
+    }
+
+    public boolean isTransparent() {
+        return this.transparent;
+    }
+
+    public boolean isExplored() {
+        return explored;
+    }
+
+    public void explore() {
+        this.explored = true;
+    }
+
+    public LightSource getLightSource() {
+        return lightSource;
+    }
+
+    public void setLightSource(LightSource l) {
+        this.lightSource = l;
+        this.curChar = '*';
+        this.foreground = Color.ORANGE;
+        this.background = Color.BLACK;
+    }
+
+    public void removeLightSource(LightSource lightSource) {
+        this.lightSource = null;
+        this.curChar = this.type.getChar();
+        this.foreground = this.type.getForeground();
+        this.background = this.type.getBackground();
     }
 
 
@@ -88,19 +131,25 @@ public class Tile {
      * An enum representing tile types.
      */
     public enum Type {
-        FLOOR('.', AsciiPanel.brightBlack, AsciiPanel.black, true),
-        WALL('#', AsciiPanel.yellow, AsciiPanel.black, false);
+//        FLOOR(' ', AsciiPanel.black, AsciiPanel.black, true, true),
+//        WALL(' ', AsciiPanel.black, AsciiPanel.black, false, false),
+        FLOOR((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
+        WALL((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
+//        FLOOR_EXPLORED((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
+//        WALL_EXPLORED((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
 
         private char c;
         private Color foreground;
         private Color background;
         private Boolean walkable;
+        private Boolean transparent;
 
-        Type(char c, Color foreground, Color background, boolean walkable) {
+        Type(char c, Color foreground, Color background, boolean walkable, boolean transparent) {
             this.c = c;
             this.foreground = foreground;
             this.background = background;
             this.walkable = walkable;
+            this.transparent = transparent;
         }
 
         public char getChar() {
@@ -117,6 +166,10 @@ public class Tile {
 
         public Boolean getWalkable() {
             return walkable;
+        }
+
+        public Boolean getTransparent() {
+            return transparent;
         }
     }
 }

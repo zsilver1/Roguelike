@@ -80,6 +80,34 @@ public abstract class LevelGenerator {
         }
     }
 
+    public int numNeighboring(int x, int y, int within, Tile.Type type) {
+        int number = 0;
+        int startX = 0;
+        int startY = 0;
+        int endX = this.width;
+        int endY = this.height;
+        if (x - within >= 0) {
+            startX = x - within;
+        }
+        if (y - within >= 0) {
+            startY = y - within;
+        }
+        if (x + within < this.width) {
+            endX = x + within + 1;
+        }
+        if (y + within < this.height) {
+            endY = y + within + 1;
+        }
+        for (int xi = startX; xi < endX; xi++) {
+            for (int yi = startY; yi < endY; yi++) {
+                if (this.tiles[xi][yi].getType() == type) {
+                    number++;
+                }
+            }
+        }
+        return number;
+    }
+
     public int getStartingPlayerX() {
         return startingPlayerX;
     }
