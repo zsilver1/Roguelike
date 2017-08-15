@@ -1,6 +1,9 @@
 package roguelike.generators;
 
+import roguelike.Level;
 import roguelike.Tile;
+import roguelike.Torch;
+import roguelike.Wall;
 
 import java.util.*;
 
@@ -8,20 +11,16 @@ public class CaveGenerator extends LevelGenerator {
 
     private Random random = new Random();
 
-    public CaveGenerator(int width, int height) {
-        super(width, height);
+    public CaveGenerator(int width, int height, Level l) {
+        super(width, height, l);
     }
 
     @Override
     public Tile[][] generate() {
-        this.fillWithWallsAtProb(48);
-        // create strips to ensure path
-        this.filledRect(0, this.height/2 - 2, this.width, 2, Tile.Type.FLOOR);
-        this.filledRect(0, 1, this.width, 2, Tile.Type.FLOOR);
-        this.filledRect(0, this.height - 5, this.width, 2, Tile.Type.FLOOR);
+        this.fillWithWallsAtProb(45);
 
         // surround with walls
-        this.hollowRect(0, 0, this.width, this.height, 1, Tile.Type.WALL);
+        this.hollowRect(0, 0, this.width, this.height, 1);
 
         for (int i = 0; i < 4; i++) {
             this.firstStep();
@@ -31,10 +30,10 @@ public class CaveGenerator extends LevelGenerator {
         }
 
         if (this.floodFill()) {
-            this.fillMapWith(Tile.Type.FLOOR);
             return this.generate();
         }
         this.clearSingleWalls();
+        this.placeTorches(30);
 
         this.placePlayer();
         return this.tiles;
@@ -43,12 +42,26 @@ public class CaveGenerator extends LevelGenerator {
     private void placePlayer() {
         int startX = this.random.nextInt(this.width / 4);
         int startY = (3 * this.height / 4) + this.random.nextInt(this.height / 4);
-        while (this.tiles[startX][startY].getType() == Tile.Type.WALL) {
+        while (this.tiles[startX][startY].getGameObject() instanceof Wall) {
             startX = this.random.nextInt(this.width / 4);
             startY = (3 * this.height / 4) + this.random.nextInt(this.height / 4);
         }
         this.startingPlayerX = startX;
         this.startingPlayerY = startY;
+    }
+
+    private void placeTorches(int num) {
+        for (int i = 0; i < num; i++) {
+            int x = this.random.nextInt(this.width);
+            int y = this.random.nextInt(this.height);
+            int walls = this.numNeighboringWalls(x, y, 1);
+            while (walls < 2 || walls > 5) {
+                x = this.random.nextInt(this.width);
+                y = this.random.nextInt(this.height);
+                walls = this.numNeighboringWalls(x, y, 1);
+            }
+            this.tiles[x][y].setGameObject(new Torch(x, y, this.level));
+        }
     }
 
     private void fillWithWallsAtProb(int prob) {
@@ -62,9 +75,9 @@ public class CaveGenerator extends LevelGenerator {
             for (int y = 0; y < this.height; y++) {
                 num = this.random.nextInt(100);
                 if (num > prob) {
-                    this.tiles[x][y] = new Tile(x, y, Tile.Type.FLOOR);
+                    this.tiles[x][y] = new Tile(x, y);
                 } else {
-                    this.tiles[x][y] = new Tile(x, y, Tile.Type.WALL);
+                    this.tiles[x][y] = new Tile(x, y, new Wall(x, y));
                 }
             }
         }
@@ -76,17 +89,17 @@ public class CaveGenerator extends LevelGenerator {
         Tile[][] newTiles = new Tile[this.width][this.height];
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getType());
+                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getGameObject());
             }
         }
         for (int x = 1; x < this.width - 1; x++) {
             for (int y = 1; y < this.height - 1; y++) {
-                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
-                neighbors2 = this.numNeighboring(x, y, 2, Tile.Type.WALL);
+                neighbors = this.numNeighboringWalls(x, y, 1);
+                neighbors2 = this.numNeighboringWalls(x, y, 2);
                 if (neighbors >= 5 || neighbors2 <= 3){
-                    newTiles[x][y].setType(Tile.Type.WALL);
+                    newTiles[x][y].setGameObject(new Wall(x, y));
                 } else {
-                    newTiles[x][y].setType(Tile.Type.FLOOR);
+                    newTiles[x][y].removeGameObject();
                 }
             }
         }
@@ -98,16 +111,16 @@ public class CaveGenerator extends LevelGenerator {
         Tile[][] newTiles = new Tile[this.width][this.height];
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getType());
+                newTiles[x][y] = new Tile(x, y, this.tiles[x][y].getGameObject());
             }
         }
         for (int x = 1; x < this.width - 1; x++) {
             for (int y = 1; y < this.height - 1; y++) {
-                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
+                neighbors = this.numNeighboringWalls(x, y, 1);
                 if (neighbors >= 5){
-                    newTiles[x][y].setType(Tile.Type.WALL);
+                    newTiles[x][y].setGameObject(new Wall(x, y));
                 } else {
-                    newTiles[x][y].setType(Tile.Type.FLOOR);
+                    newTiles[x][y].removeGameObject();
                 }
             }
         }
@@ -117,8 +130,8 @@ public class CaveGenerator extends LevelGenerator {
     private void clearSingleWalls() {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                if (this.numNeighboring(x, y, 1, Tile.Type.WALL) == 1) {
-                    this.tiles[x][y].setType(Tile.Type.FLOOR);
+                if (this.numNeighboringWalls(x, y, 1) == 1) {
+                    this.tiles[x][y].removeGameObject();
                 }
             }
         }
@@ -128,7 +141,7 @@ public class CaveGenerator extends LevelGenerator {
     private boolean floodFill() {
         int startX = this.random.nextInt(this.width);
         int startY = this.random.nextInt(this.height);
-        while (this.tiles[startX][startY].getType() == Tile.Type.WALL) {
+        while (this.tiles[startX][startY].getGameObject() instanceof  Wall) {
             startX = this.random.nextInt(this.width);
             startY = this.random.nextInt(this.height);
         }
@@ -141,7 +154,7 @@ public class CaveGenerator extends LevelGenerator {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 if (!this.tiles[x][y].marked) {
-                    this.tiles[x][y].setType(Tile.Type.WALL);
+                    this.tiles[x][y].setGameObject(new Wall(x, y));
                 }
             }
         }
@@ -160,17 +173,17 @@ public class CaveGenerator extends LevelGenerator {
             }
             t.marked = true;
             numVisited++;
-            if (this.tiles[t.x-1][t.y].getType() != Tile.Type.WALL) {
-                s.push(this.tiles[t.x-1][t.y]);
+            if (this.tiles[t.getX()-1][t.getY()].isWalkable()) {
+                s.push(this.tiles[t.getX()-1][t.getY()]);
             }
-            if (this.tiles[t.x+1][t.y].getType() != Tile.Type.WALL) {
-                s.push(this.tiles[t.x+1][t.y]);
+            if (this.tiles[t.getX()+1][t.getY()].isWalkable()) {
+                s.push(this.tiles[t.getX()+1][t.getY()]);
             }
-            if (this.tiles[t.x][t.y-1].getType() != Tile.Type.WALL) {
-                s.push(this.tiles[t.x][t.y-1]);
+            if (this.tiles[t.getX()][t.getY()-1].isWalkable()) {
+                s.push(this.tiles[t.getX()][t.getY()-1]);
             }
-            if (this.tiles[t.x][t.y+1].getType() != Tile.Type.WALL) {
-                s.push(this.tiles[t.x][t.y+1]);
+            if (this.tiles[t.getX()][t.getY()+1].isWalkable()) {
+                s.push(this.tiles[t.getX()][t.getY()+1]);
             }
         }
         return numVisited;

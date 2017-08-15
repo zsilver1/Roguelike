@@ -2,12 +2,14 @@ package roguelike.generators;
 
 import roguelike.Level;
 import roguelike.Tile;
+import roguelike.Wall;
 
 public abstract class LevelGenerator {
 
     Tile[][] tiles;
     final int width;
     final int height;
+    Level level;
     int startingPlayerX;
     int startingPlayerY;
 
@@ -17,71 +19,47 @@ public abstract class LevelGenerator {
         this.tiles = new Tile[this.width][this.height];
     }
 
+    LevelGenerator(int width, int height, Level level) {
+        this(width, height);
+        this.level = level;
+    }
+
     public abstract Tile[][] generate();
 
-    public void fillMapWith(Tile.Type type) {
+    public void fillMapWithWalls() {
         for (int x = 0; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
-                this.tiles[x][y] = new Tile(x, y, type);
+                this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
     }
 
-    public void filledRect(int left, int top, int width, int height, Tile.Type type) {
-        for (int x = left; x - left < width; x++) {
-            for (int y = top; y - top < height; y++) {
-                this.tiles[x][y].setType(type);
-            }
-        }
-    }
-
-    public void filledSquareAt(int centerX, int centerY, int side, Tile.Type type) {
-        // side should always be odd, because square must have center
-        for (int x = centerX - side / 2; x <= centerX + side / 2; x++) {
-            for (int y = centerY - side / 2; y <= centerY + side / 2; y++) {
-                this.tiles[x][y].setType(type);
-            }
-        }
-    }
-
-    public void verticalLine(int startX, int startY, int len, Tile.Type type) {
-        for (int y = startY; y - startY < len; y++) {
-            this.tiles[startX][y].setType(type);
-        }
-    }
-
-    public void horizontalLine(int startX, int startY, int len, Tile.Type type) {
-        for (int x = startX; x - startX < len; x++) {
-            this.tiles[x][startY].setType(type);
-        }
-    }
-
-    public void hollowRect(int left, int top, int width, int height, int thickness, Tile.Type type) {
+    public void hollowRect(int left, int top, int width, int height, int thickness) {
         // first create rows
         for (int x = left; x - left < width; x++) {
             for (int y = top; y - top < thickness; y++) {
-                this.tiles[x][y].setType(type);
+                this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
         for (int x = left; x - left < width; x++) {
             for (int y = top + height - thickness; y - top - height + thickness < thickness; y++) {
-                this.tiles[x][y].setType(type);
+                this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
         // now columns
         for (int y = top; y - top < height; y++) {
             for (int x = left; x - left < thickness; x++) {
-                this.tiles[x][y].setType(type);
+                this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
         for (int y = top; y - top < height; y++) {
             for (int x = left + width - thickness; x - left - width + thickness < thickness; x++) {
-                this.tiles[x][y].setType(type);
+                this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
     }
 
-    public int numNeighboring(int x, int y, int within, Tile.Type type) {
+    public int numNeighboringWalls(int x, int y, int within) {
         int number = 0;
         int startX = 0;
         int startY = 0;
@@ -101,7 +79,7 @@ public abstract class LevelGenerator {
         }
         for (int xi = startX; xi < endX; xi++) {
             for (int yi = startY; yi < endY; yi++) {
-                if (this.tiles[xi][yi].getType() == type) {
+                if (this.tiles[xi][yi].getGameObject() instanceof Wall) {
                     number++;
                 }
             }

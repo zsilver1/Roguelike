@@ -1,0 +1,81 @@
+* Game
+** Attributes
+Level curLevel
+** Methods
+
+* Screen
+** Attributes
+int height
+int width
+** Methods
+void displayOutput(Terminal t)
+
+* Level
+** Attributes
+tiles
+width
+height
+
+Creature list
+Lightsource list
+
+** Methods
+getNeighbors(int x, int y, int radius)
+getTile(int x, int y)
+takeTurn()
+
+* LightSource
+** Attributes
+X
+Y
+Level level
+int radius
+
+** Methods
+castLight (updates tiles illumination)
+
+* Creature
+
+
+* GameObject
+** Attributes
+X
+Y
+Level level
+bool transparent
+bool walkable
+char character
+color foreground
+color background
+
+* Tile
+** Attributes
+x
+y
+illumination
+GameObject gameObject
+Creature creature
+bool explored
+
+curChar
+curForeground
+curBackground
+
+** Methods
+update:
+#+BEGIN_SRC python
+  if explored:
+      if creature is present:
+          char = creature.char
+      elif gameObject is present:
+          char = gameObject.char
+      else:
+          char = '.'
+      if illumination > 0:
+          set colors
+  else:
+       char = ' '
+       foreground = black
+       background = black
+#+END_SRC
+

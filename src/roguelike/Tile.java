@@ -7,47 +7,45 @@ import java.awt.*;
 public class Tile {
 
 
-    /**
-     * X coordinate of tile.
-     */
-    public final int x;
-
-    /**
-     * Y coordinate of tile.
-     */
-    public final int y;
-
-    /**
-     * Used for various algorithms.
-     */
+    private final int x;
+    private final int y;
     public boolean marked;
 
-    // Used for actual char value of tile, in case of creature or object
+    private static final char DEFAULT_CHAR = '.';
+    private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.GRAY;
+    private static final Color DEFAULT_UNEXPLORED_FORGROUND = Color.BLACK;
+    private static final Color DEFAULT_BACKGROUND = Color.BLACK;
+    private static final boolean DEFAULT_WALKABLE = true;
+    private static final boolean DEFAULT_TRANSPARENT = true;
+
     private char curChar;
-    private Type type;
-    private Color foreground;
-    private Color background;
+    private Color curForeground;
+    private Color curBackground;
+
+    private Creature creature;
+    private GameObject gameObject;
+
     private boolean walkable;
     private boolean transparent;
     private boolean explored;
     private float illumination;
-    private Creature creature;
-    private LightSource lightSource;
 
-    /**
-     * Create a new tile.
-     * @param x x location
-     * @param y y location
-     */
-    public Tile(int x, int y, Tile.Type type) {
+
+    public Tile(int x, int y) {
         this.x = x;
         this.y = y;
-        this.type = type;
-        this.curChar = this.type.getChar();
-        this.foreground = this.type.getForeground();
-        this.background = this.type.getBackground();
-        this.walkable = this.type.getWalkable();
-        this.transparent = this.type.getTransparent();
+        this.curChar = DEFAULT_CHAR;
+        this.curForeground = DEFAULT_UNEXPLORED_FORGROUND;
+        this.curBackground = DEFAULT_BACKGROUND;
+    }
+
+    public Tile(int x, int y, GameObject g) {
+        this(x, y);
+        this.gameObject = g;
+    }
+
+    public void updateGraphics() {
+        // TODO
     }
 
     public char getChar() {
@@ -61,35 +59,64 @@ public class Tile {
     public void setCreature(Creature creature) {
         this.creature = creature;
         this.curChar = creature.getCharacter();
-        this.foreground = creature.getForeground();
-        this.background = creature.getBackground();
+        this.curForeground = creature.getForeground();
+        this.curBackground = creature.getBackground();
+    }
+
+    public boolean hasCreature() {
+        return (this.creature != null);
     }
 
     public void removeCreature() {
         this.creature = null;
-        this.curChar = this.type.getChar();
-        this.foreground = this.type.getForeground();
-        this.background = this.type.getBackground();
+        if (this.hasGameObject()) {
+            this.curChar = this.gameObject.getCharacter();
+            this.curForeground = this.gameObject.getForeground();
+            this.curBackground = this.gameObject.getBackground();
+        } else {
+            this.curChar = DEFAULT_CHAR;
+            this.curForeground = (this.explored ? DEFAULT_EXPLORED_FOREGROUND : DEFAULT_UNEXPLORED_FORGROUND);
+            this.curBackground = DEFAULT_BACKGROUND;
+        }
+    }
+
+    public GameObject getGameObject() {
+        return this.gameObject;
+    }
+
+    public void setGameObject(GameObject gameObject) {
+        this.gameObject = gameObject;
+        if (!this.hasCreature()) {
+            this.curChar = gameObject.getCharacter();
+            this.curForeground = gameObject.getForeground();
+            this.curBackground = gameObject.getBackground();
+        }
+        this.walkable = gameObject.isWalkable();
+        this.transparent = gameObject.isTransparent();
+
+    }
+
+    public boolean hasGameObject() {
+        return (this.gameObject != null);
+    }
+
+    public void removeGameObject() {
+        this.gameObject = null;
+        if (!this.hasCreature()) {
+            this.curChar = DEFAULT_CHAR;
+            this.curForeground = (this.explored ? DEFAULT_EXPLORED_FOREGROUND : DEFAULT_UNEXPLORED_FORGROUND);
+            this.curBackground = DEFAULT_BACKGROUND;
+        }
+        this.walkable = DEFAULT_WALKABLE;
+        this.transparent = DEFAULT_TRANSPARENT;
     }
 
     public Color getForeground() {
-        return foreground;
+        return this.curForeground;
     }
 
     public Color getBackground() {
-        return background;
-    }
-
-    public Type getType() {
-        return this.type;
-    }
-
-    public void setType(Tile.Type newType) {
-        this.type = newType;
-        this.curChar = this.type.getChar();
-        this.foreground = this.type.getForeground();
-        this.background = this.type.getBackground();
-        this.walkable = this.type.getWalkable();
+        return this.curBackground;
     }
 
     public boolean isWalkable() {
@@ -108,68 +135,19 @@ public class Tile {
         this.explored = true;
     }
 
-    public LightSource getLightSource() {
-        return lightSource;
+    public int getX() {
+        return x;
     }
 
-    public void setLightSource(LightSource l) {
-        this.lightSource = l;
-        this.curChar = '*';
-        this.foreground = Color.ORANGE;
-        this.background = Color.BLACK;
+    public int getY() {
+        return y;
     }
 
-    public void removeLightSource(LightSource lightSource) {
-        this.lightSource = null;
-        this.curChar = this.type.getChar();
-        this.foreground = this.type.getForeground();
-        this.background = this.type.getBackground();
+    public float getIllumination() {
+        return illumination;
     }
 
-
-    /**
-     * An enum representing tile types.
-     */
-    public enum Type {
-        FLOOR((char)249, Color.GRAY, Color.black, true, true),
-        WALL((char)219, Color.YELLOW, Color.black, false, false),
-        FLOOR_UNEXPLORED(' ', Color.black, Color.black, true, true),
-        WALL_UNEXPLORED(' ', AsciiPanel.black, AsciiPanel.black, false, false),
-        FLOOR_EXPLORED((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
-        WALL_EXPLORED((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
-
-        private char c;
-        private Color foreground;
-        private Color background;
-        private Boolean walkable;
-        private Boolean transparent;
-
-        Type(char c, Color foreground, Color background, boolean walkable, boolean transparent) {
-            this.c = c;
-            this.foreground = foreground;
-            this.background = background;
-            this.walkable = walkable;
-            this.transparent = transparent;
-        }
-
-        public char getChar() {
-            return this.c;
-        }
-
-        public Color getBackground() {
-            return background;
-        }
-
-        public Color getForeground() {
-            return foreground;
-        }
-
-        public Boolean getWalkable() {
-            return walkable;
-        }
-
-        public Boolean getTransparent() {
-            return transparent;
-        }
+    public void setIllumination(float illumination) {
+        this.illumination = illumination;
     }
 }

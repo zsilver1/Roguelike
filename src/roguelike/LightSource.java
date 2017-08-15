@@ -11,7 +11,6 @@ public class LightSource {
         this.y = y;
         this.radius = radius;
         this.level = level;
-        this.level.getTile(x, y).setLightSource(this);
     }
 
     public void update() {
