@@ -8,7 +8,7 @@ import asciiPanel.AsciiPanel;
 import roguelike.screens.Screen;
 import roguelike.screens.StartScreen;
 
-public class Main extends JFrame implements KeyListener {
+public class Game extends JFrame implements KeyListener {
     private AsciiPanel terminal;
     private Screen screen;
 
@@ -17,7 +17,7 @@ public class Main extends JFrame implements KeyListener {
     private static final int WIDTH = 175;
     private static final int HEIGHT = 55;
 
-    private Main() {
+    private Game() {
         super();
         terminal = new AsciiPanel(WIDTH, HEIGHT);
         add(terminal);
@@ -28,7 +28,7 @@ public class Main extends JFrame implements KeyListener {
     }
 
     public static void main(final String[] args) {
-        Main app = new Main();
+        Game app = new Game();
         app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         app.setVisible(true);
     }

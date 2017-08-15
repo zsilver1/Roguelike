@@ -1,6 +1,5 @@
 package roguelike.generators;
 
-import roguelike.LightSource;
 import roguelike.Tile;
 
 import java.util.*;
@@ -37,7 +36,6 @@ public class CaveGenerator extends LevelGenerator {
         }
         this.clearSingleWalls();
 
-        this.placeLights(25);
         this.placePlayer();
         return this.tiles;
     }
@@ -51,21 +49,6 @@ public class CaveGenerator extends LevelGenerator {
         }
         this.startingPlayerX = startX;
         this.startingPlayerY = startY;
-    }
-
-    private void placeLights(int numLights) {
-        for (int i = 0; i < numLights; i++) {
-            int x = this.random.nextInt(this.width);
-            int y = this.random.nextInt(this.height);
-            int neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
-            while (this.tiles[x][y].getType() != Tile.Type.FLOOR ||
-                    neighbors < 2 || neighbors > 5) {
-                x = this.random.nextInt(this.width);
-                y = this.random.nextInt(this.height);
-                neighbors = this.numNeighboring(x, y, 1, Tile.Type.WALL);
-            }
-            this.tiles[x][y].setLightSource(new LightSource());
-        }
     }
 
     private void fillWithWallsAtProb(int prob) {

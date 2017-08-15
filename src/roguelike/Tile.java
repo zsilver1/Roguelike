@@ -131,12 +131,12 @@ public class Tile {
      * An enum representing tile types.
      */
     public enum Type {
-//        FLOOR(' ', AsciiPanel.black, AsciiPanel.black, true, true),
-//        WALL(' ', AsciiPanel.black, AsciiPanel.black, false, false),
-        FLOOR((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
-        WALL((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
-//        FLOOR_EXPLORED((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
-//        WALL_EXPLORED((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
+        FLOOR((char)249, Color.GRAY, Color.black, true, true),
+        WALL((char)219, Color.YELLOW, Color.black, false, false),
+        FLOOR_UNEXPLORED(' ', Color.black, Color.black, true, true),
+        WALL_UNEXPLORED(' ', AsciiPanel.black, AsciiPanel.black, false, false),
+        FLOOR_EXPLORED((char)249, Color.DARK_GRAY, AsciiPanel.black, true, true),
+        WALL_EXPLORED((char)219, Color.DARK_GRAY, AsciiPanel.black, true, true);
 
         private char c;
         private Color foreground;

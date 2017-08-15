@@ -1,5 +1,6 @@
 package roguelike.generators;
 
+import roguelike.Level;
 import roguelike.Tile;
 
 public abstract class LevelGenerator {
