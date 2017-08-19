@@ -3,9 +3,9 @@ package roguelike;
 import java.awt.*;
 
 public abstract class Creature {
-    private int x;
-    private int y;
-    private final Level level;
+    int x;
+    int y;
+    final Level level;
     private final char character;
     private final Color foreground;
     private final Color background;

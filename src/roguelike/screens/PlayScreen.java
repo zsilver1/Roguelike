@@ -6,52 +6,35 @@ import roguelike.Player;
 
 import java.awt.event.KeyEvent;
 
-public class PlayScreen implements Screen {
-    private Level level;
+public class PlayScreen {
+    private UtilityScreen utilityScreen;
     private int width;
     private int height;
     private int left;
-    private UtilityScreen utilityScreen;
 
-    PlayScreen(int terminalWidth, int terminalHeight) {
-        // playable screen width is right 4/5 of terminal
-        this.width = terminalWidth;
-        this.left = terminalWidth / 5;
-        this.height = terminalHeight;
-        this.level = new Level(this.width - this.left, this.height);
-        this.utilityScreen = new UtilityScreen(this.width, this.height);
+    public PlayScreen(int w, int h) {
+        this.width = w;
+        this.height = h;
+        this.left = this.width / 5;
+        this.utilityScreen = new UtilityScreen(this.width / 5, this.height);
     }
 
-    @Override
-    public void displayOutput(AsciiPanel terminal) {
-        this.displayLevel(terminal);
-        this.utilityScreen.displayOutput(terminal);
+    public void displayScreen(AsciiPanel terminal, Level level) {
+        this.utilityScreen.displayScreen(terminal);
+        this.displayLevel(terminal, level);
     }
 
-    @Override
-    public Screen respondToUserInput(KeyEvent key) {
-        Player p = this.level.getPlayer();
-        switch (key.getKeyCode()) {
-            case KeyEvent.VK_LEFT: p.moveLeft(); break;
-            case KeyEvent.VK_RIGHT: p.moveRight(); break;
-            case KeyEvent.VK_DOWN: p.moveDown(); break;
-            case KeyEvent.VK_UP: p.moveUp(); break;
-            default: break;
-        }
-        return this;
-    }
-
-    private void displayLevel(AsciiPanel terminal) {
+    private void displayLevel(AsciiPanel terminal, Level level) {
         int levelX;
         for (int x = this.left; x < this.width; x++) {
             for (int y = 0; y < this.height; y++) {
                 levelX = x - this.left;
                 terminal.write(
-                        this.level.getTile(levelX, y).getChar(),
+                        level.getTile(levelX, y).getChar(),
                         x,
                         y,
-                        this.level.getTile(levelX, y).getForeground(),
-                        this.level.getTile(levelX, y).getBackground());
+                        level.getTile(levelX, y).getForeground(),
+                        level.getTile(levelX, y).getBackground());
             }
         }
     }

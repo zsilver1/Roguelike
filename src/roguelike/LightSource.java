@@ -1,5 +1,7 @@
 package roguelike;
 
+import java.util.ArrayDeque;
+
 public class LightSource {
     private int x;
     private int y;

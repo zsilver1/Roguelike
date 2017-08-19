@@ -8,16 +8,15 @@ import java.awt.event.KeyEvent;
  * of the terminal screen. This screen contains information
  * such as status of the player, relevant keys to press, etc.
  */
-public class UtilityScreen implements Screen {
-
-    private int width;
-    private int height;
+public class UtilityScreen {
     private String[] lines;
     private int curLine;
+    private int width;
+    private int height;
 
-    public UtilityScreen(int terminalWidth, int terminalHeight) {
-        this.height = terminalHeight;
-        this.width = terminalWidth / 5;
+    public UtilityScreen(int w, int h) {
+        this.width = w;
+        this.height = h;
         this.lines = new String[this.height];
         this.curLine = 0;
     }
@@ -47,8 +46,7 @@ public class UtilityScreen implements Screen {
         this.curLine += num;
     }
 
-    @Override
-    public void displayOutput(AsciiPanel terminal) {
+    public void displayScreen(AsciiPanel terminal) {
         for (int y = 0; y < this.height; y++) {
             if (this.lines[y] == null) {
                 terminal.write(' ', 0, y);
@@ -57,10 +55,5 @@ public class UtilityScreen implements Screen {
             }
             terminal.write('|', this.width - 1, y, AsciiPanel.red);
         }
-    }
-
-    @Override
-    public Screen respondToUserInput(KeyEvent key) {
-        return null;
     }
 }

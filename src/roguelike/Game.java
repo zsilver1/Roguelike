@@ -5,26 +5,30 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import asciiPanel.AsciiPanel;
-import roguelike.screens.Screen;
-import roguelike.screens.StartScreen;
+import roguelike.modes.GameMode;
+import roguelike.modes.PlayMode;
 
 public class Game extends JFrame implements KeyListener {
     private AsciiPanel terminal;
-    private Screen screen;
+
+    //TODO change game modes to singleton pattern?
+    private GameMode gameMode;
+    private Level curLevel;
 
     // represent the terminal width and height, given to
     // every screen as initialization input
-    private static final int WIDTH = 175;
-    private static final int HEIGHT = 55;
+    public static final int WIDTH = 175;
+    public static final int HEIGHT = 55;
 
     private Game() {
         super();
-        terminal = new AsciiPanel(WIDTH, HEIGHT);
+        this.terminal = new AsciiPanel(WIDTH, HEIGHT);
+        this.curLevel = new Level(WIDTH * 4 / 5, HEIGHT);
+        this.gameMode = new PlayMode(this.curLevel);
         add(terminal);
         pack();
-        screen = new StartScreen(WIDTH, HEIGHT);
         addKeyListener(this);
-        repaint();
+        this.repaint();
     }
 
     public static void main(final String[] args) {
@@ -36,13 +40,13 @@ public class Game extends JFrame implements KeyListener {
     @Override
     public void repaint() {
         terminal.clear();
-        screen.displayOutput(terminal);
+        this.gameMode.displayScreen(this.terminal);
         super.repaint();
     }
 
     @Override
     public void keyPressed(final KeyEvent e) {
-        screen = screen.respondToUserInput(e);
+        this.gameMode = this.gameMode.respondToUserInput(e);
         this.repaint();
     }
 

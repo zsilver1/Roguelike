@@ -34,6 +34,14 @@ public abstract class LevelGenerator {
         }
     }
 
+    public void initMap() {
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                this.tiles[x][y] = new Tile(x, y);
+            }
+        }
+    }
+
     public void hollowRect(int left, int top, int width, int height, int thickness) {
         // first create rows
         for (int x = left; x - left < width; x++) {

@@ -1,5 +1,6 @@
 package roguelike;
 
+import roguelike.generators.BasicLevelGenerator;
 import roguelike.generators.CaveGenerator;
 import roguelike.generators.LevelGenerator;
 
@@ -21,18 +22,51 @@ public class Level {
         this.creatures = new LinkedList<>();
         this.lightSources = new LinkedList<>();
 
-        //LevelGenerator gen = new BasicLevelGenerator(width, height);
-        LevelGenerator gen = new CaveGenerator(width, height, this);
+        LevelGenerator gen = new BasicLevelGenerator(width, height);
+        //LevelGenerator gen = new CaveGenerator(width, height, this);
         this.tiles = gen.generate();
         this.player = new Player(this, gen.getStartingPlayerX(), gen.getStartingPlayerY());
     }
 
     public Tile getTile(int x, int y) {
-        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+        if (this.isValid(x, y)) {
             return this.tiles[x][y];
+        } else if (this.isValidX(x)) {
+            if (y < 0) {
+                return this.tiles[x][0];
+            } else {
+                return this.tiles[x][this.height-1];
+            }
+        } else if (this.isValidY(y)) {
+            if (x < 0) {
+                return this.tiles[0][y];
+            } else {
+                return this.tiles[this.width-1][y];
+            }
         } else {
-            throw new IndexOutOfBoundsException("Invalid tile");
+            if (x < 0 && y < 0) {
+                return this.tiles[0][0];
+            } else if (x > this.width-1 && y < 0) {
+                return this.tiles[this.width-1][0];
+            } else if (x > this.width-1 && y > this.height-1) {
+                return this.tiles[this.width-1][this.height-1];
+            } else if (x < 0 && y > this.height-1) {
+                return this.tiles[0][this.height-1];
+            }
         }
+        throw new IndexOutOfBoundsException("Invalid Tile");
+    }
+
+    public boolean isValid(int x, int y) {
+        return (x >= 0 && x < this.width && y >= 0 && y < this.height);
+    }
+
+    private boolean isValidX(int x) {
+        return (x >= 0 && x < this.width);
+    }
+
+    private boolean isValidY(int y) {
+        return (y >= 0 && y < this.height);
     }
 
     public ListIterator<Tile> getTiles(int x, int y, int within) {

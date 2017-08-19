@@ -1,8 +1,15 @@
 * Game
 ** Attributes
 Level curLevel
+GameMode curMode
+Screen curScreen
 ** Methods
-
+switchMode (switches mode, also screen if needed)
+* GameMode
+** Attributes
+Screen screen (only needed for some modes, like cursor mode?)
+** Methods
+respondToUserInput(KeyEvent k)
 * Screen
 ** Attributes
 int height
@@ -10,6 +17,7 @@ int width
 ** Methods
 void displayOutput(Terminal t)
 
+* Subscreen?
 * Level
 ** Attributes
 tiles
@@ -35,7 +43,6 @@ int radius
 castLight (updates tiles illumination)
 
 * Creature
-
 
 * GameObject
 ** Attributes
@@ -79,3 +86,10 @@ update:
        background = black
 #+END_SRC
 
+
+
+* GAMEMODES:
+- play (player, screen)
+- cursor (level, screen)
+- inventory (player, screen)
+- start menu (screen)
