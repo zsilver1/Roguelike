@@ -27,6 +27,7 @@ public class Player extends Creature {
     Taken from SquidLib Library.
      */
     public void updateFOV() {
+        this.level.setTilesToNotVisible();
         this.level.getTile(this.x, this.y).setToVisible();
         this.level.getTile(this.x, this.y).explore();
         for (int[] d : DIAGONALS) {

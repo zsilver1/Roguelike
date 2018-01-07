@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 public class Level {
-    private Tile[][] tiles;
+    private ArrayList<Tile> tiles;
     private final int width;
     private final int height;
     private LinkedList<Creature> creatures;
@@ -30,31 +30,35 @@ public class Level {
 
     public Tile getTile(int x, int y) {
         if (this.isValid(x, y)) {
-            return this.tiles[x][y];
+            return this.getTileHelper(x, y);
         } else if (this.isValidX(x)) {
             if (y < 0) {
-                return this.tiles[x][0];
+                return this.getTileHelper(x, 0);
             } else {
-                return this.tiles[x][this.height-1];
+                return this.getTileHelper(x, this.height - 1);
             }
         } else if (this.isValidY(y)) {
             if (x < 0) {
-                return this.tiles[0][y];
+                return this.getTileHelper(0, y);
             } else {
-                return this.tiles[this.width-1][y];
+                return this.getTileHelper(this.width - 1, y);
             }
         } else {
             if (x < 0 && y < 0) {
-                return this.tiles[0][0];
+                return this.getTileHelper(0, 0);
             } else if (x > this.width-1 && y < 0) {
-                return this.tiles[this.width-1][0];
+                return this.getTileHelper(this.width - 1, 0);
             } else if (x > this.width-1 && y > this.height-1) {
-                return this.tiles[this.width-1][this.height-1];
+                return this.getTileHelper(this.width - 1, this.height - 1);
             } else if (x < 0 && y > this.height-1) {
-                return this.tiles[0][this.height-1];
+                return this.getTileHelper(0, this.height - 1);
             }
         }
         throw new IndexOutOfBoundsException("Invalid Tile");
+    }
+
+    private Tile getTileHelper(int x, int y) {
+        return this.tiles.get(x * this.height + y);
     }
 
     public boolean isValid(int x, int y) {
@@ -96,10 +100,18 @@ public class Level {
                 if (excludingCenter && xi == x && yi == y) {
                     continue;
                 }
-                a.add(this.tiles[xi][yi]);
+                a.add(this.getTile(xi, yi));
             }
         }
         return a.listIterator();
+    }
+
+    public void setTilesToNotVisible() {
+        for (int x = 0; x < this.width; x++) {
+            for (int y = 0; y < this.height; y++) {
+                this.getTile(x, y).setToNotVisible();
+            }
+        }
     }
 
 

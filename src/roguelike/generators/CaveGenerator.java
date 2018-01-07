@@ -16,7 +16,7 @@ public class CaveGenerator extends LevelGenerator {
     }
 
     @Override
-    public Tile[][] generate() {
+    public ArrayList<Tile> generate() {
         this.fillWithWallsAtProb(45);
 
         // surround with walls
@@ -36,7 +36,19 @@ public class CaveGenerator extends LevelGenerator {
         this.placeTorches(30);
 
         this.placePlayer();
-        return this.tiles;
+        return this.flatten(this.tiles);
+    }
+
+    private Tile get(int x, int y) {
+        if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+            return this.tiles[x][y];
+        }
+        return null;
+    }
+
+    private boolean tile_is_walkable(int x, int y) {
+        Tile t = this.get(x, y);
+        return t != null && t.isWalkable();
     }
 
     private void placePlayer() {
@@ -173,16 +185,16 @@ public class CaveGenerator extends LevelGenerator {
             }
             t.marked = true;
             numVisited++;
-            if (this.tiles[t.getX()-1][t.getY()].isWalkable()) {
+            if (this.tile_is_walkable(t.getX() - 1, t.getY())) {
                 s.push(this.tiles[t.getX()-1][t.getY()]);
             }
-            if (this.tiles[t.getX()+1][t.getY()].isWalkable()) {
+            if (this.tile_is_walkable(t.getX() + 1, t.getY())) {
                 s.push(this.tiles[t.getX()+1][t.getY()]);
             }
-            if (this.tiles[t.getX()][t.getY()-1].isWalkable()) {
+            if (this.tile_is_walkable(t.getX(), t.getY() - 1)) {
                 s.push(this.tiles[t.getX()][t.getY()-1]);
             }
-            if (this.tiles[t.getX()][t.getY()+1].isWalkable()) {
+            if (this.tile_is_walkable(t.getX(), t.getY() + 1)) {
                 s.push(this.tiles[t.getX()][t.getY()+1]);
             }
         }

@@ -9,10 +9,13 @@ public class Tile {
     private final int y;
     public boolean marked;
 
-    private static final char DEFAULT_CHAR = '.';
-    private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.DARK_GRAY;
-    private static final Color DEFAULT_UNEXPLORED_FOREGROUND = Color.BLACK;
-    private static final Color DEFAULT_BACKGROUND = Color.BLACK;
+    private static final char DEFAULT_CHAR = ' ';
+    private static final Color DEFAULT_EXPLORED_BACKGROUND = Color.DARK_GRAY;
+    private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.LIGHT_GRAY;
+    private static final Color DEFAULT_VISIBLE_FOREGROUND = Color.RED;
+    private static final Color DEFAULT_VISIBLE_BACKGROUND = Color.YELLOW;
+        private static final Color DEFAULT_UNEXPLORED_FOREGROUND = Color.BLACK;
+    private static final Color DEFAULT_UNEXPLORED_BACKGROUND = Color.BLACK;
     private static final boolean DEFAULT_WALKABLE = true;
     private static final boolean DEFAULT_TRANSPARENT = true;
 
@@ -36,7 +39,7 @@ public class Tile {
         this.y = y;
         this.curChar = DEFAULT_CHAR;
         this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
-        this.curBackground = DEFAULT_BACKGROUND;
+        this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
     }
 
     public Tile(int x, int y, GameObject g) {
@@ -145,22 +148,37 @@ public class Tile {
     }
 
     private void updateGraphic() {
+        // FIXME fix colors and stuff
         if (!this.explored) {
             this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
+            this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
             this.curChar = DEFAULT_CHAR;
-        } else if (this.hasCreature() && this.visible) {
-            this.curForeground = this.creature.getForeground();
+        } else if (this.hasCreature()) {
             this.curChar = this.creature.getCharacter();
+            if (this.visible) {
+                this.curForeground = this.creature.getForeground();
+                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+            } else {
+                this.curForeground = this.creature.getForeground().darker();
+                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
+            }
         } else if (this.hasGameObject()) {
+            this.curChar = this.gameObject.getCharacter();
             if (this.visible) {
                 this.curForeground = this.gameObject.getForeground();
+                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+            } else {
+                this.curForeground = this.gameObject.getForeground().darker();
+                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
             }
-            else {
-                this.curForeground = DEFAULT_EXPLORED_FOREGROUND;
-            }
-            this.curChar = this.gameObject.getCharacter();
+        } else if (this.visible){
+            this.curForeground = DEFAULT_VISIBLE_FOREGROUND;
+            this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+            this.curChar = DEFAULT_CHAR;
         } else {
+            // explored but not visible
             this.curForeground = DEFAULT_EXPLORED_FOREGROUND;
+            this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
             this.curChar = DEFAULT_CHAR;
         }
     }

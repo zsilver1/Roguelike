@@ -4,6 +4,10 @@ import roguelike.Level;
 import roguelike.Tile;
 import roguelike.Wall;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 public abstract class LevelGenerator {
 
     Tile[][] tiles;
@@ -24,7 +28,7 @@ public abstract class LevelGenerator {
         this.level = level;
     }
 
-    public abstract Tile[][] generate();
+    public abstract ArrayList<Tile> generate();
 
     public void fillMapWithWalls() {
         for (int x = 0; x < this.width; x++) {
@@ -32,6 +36,14 @@ public abstract class LevelGenerator {
                 this.tiles[x][y].setGameObject(new Wall(x, y));
             }
         }
+    }
+
+    public ArrayList<Tile> flatten(Tile[][] t) {
+        ArrayList<Tile> list = new ArrayList<>();
+        for (Tile[] l : t) {
+            Collections.addAll(list, l);
+        }
+        return list;
     }
 
     public void initMap() {

@@ -37,6 +37,10 @@ public class Game extends JFrame implements KeyListener {
         app.setVisible(true);
     }
 
+    public static void exit() {
+        System.exit(0);
+    }
+
     @Override
     public void repaint() {
         terminal.clear();

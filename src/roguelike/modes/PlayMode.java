@@ -25,6 +25,7 @@ public class PlayMode extends GameMode {
             case KeyEvent.VK_RIGHT: p.moveRight(); break;
             case KeyEvent.VK_DOWN: p.moveDown(); break;
             case KeyEvent.VK_UP: p.moveUp(); break;
+            case KeyEvent.VK_ESCAPE: Game.exit();
             default: break;
         }
         return this;
