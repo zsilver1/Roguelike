@@ -2,7 +2,7 @@ package roguelike;
 
 import java.awt.*;
 
-public abstract class Creature {
+public abstract class Actor {
     int x;
     int y;
     final Level level;
@@ -10,14 +10,14 @@ public abstract class Creature {
     private final Color foreground;
     private final Color background;
 
-    public Creature(Level level, int startingX, int startingY, char c, Color fg, Color bg) {
+    public Actor(Level level, int startingX, int startingY, char c, Color fg, Color bg) {
         this.level = level;
         this.x = startingX;
         this.y = startingY;
         this.character = c;
         this.foreground = fg;
         this.background = bg;
-        this.level.getTile(x, y).setCreature(this);
+        this.level.getTile(x, y).setActor(this);
     }
 
     public void moveTo(int newX, int newY) {
@@ -29,10 +29,10 @@ public abstract class Creature {
             return;
         }
         if (t.isWalkable()) {
-            this.level.getTile(this.x, this.y).removeCreature();
+            this.level.getTile(this.x, this.y).removeActor();
             this.x = newX;
             this.y = newY;
-            t.setCreature(this);
+            t.setActor(this);
         }
     }
 

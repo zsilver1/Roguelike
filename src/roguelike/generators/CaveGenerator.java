@@ -1,9 +1,6 @@
 package roguelike.generators;
 
-import roguelike.Level;
-import roguelike.Tile;
-import roguelike.Torch;
-import roguelike.Wall;
+import roguelike.*;
 
 import java.util.*;
 
@@ -72,7 +69,9 @@ public class CaveGenerator extends LevelGenerator {
                 y = this.random.nextInt(this.height);
                 walls = this.numNeighboringWalls(x, y, 1);
             }
-            this.tiles[x][y].setGameObject(new Torch(x, y, this.level));
+            Torch t = new Torch(x, y, this.level);
+            this.lightSources.add(t.getLightSource());
+            this.tiles[x][y].setGameObject(t);
         }
     }
 

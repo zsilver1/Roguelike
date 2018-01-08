@@ -2,18 +2,19 @@ package roguelike;
 
 import asciiPanel.AsciiPanel;
 
-import static java.lang.Math.sqrt;
-
-public class Player extends Creature {
+public class Player extends Actor {
 
     /*
     (x, y)
      */
     private static final int[][] DIAGONALS = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
     private static final int FOV_RADIUS = 30;
+    private LightSource lightSource;
 
     public Player(Level level, int x, int y) {
         super(level, x, y, '@', AsciiPanel.brightCyan, AsciiPanel.black);
+        // this.lightSource = new LightSource(x, y, 10, level);
+        level.recomputeLight();
         this.updateFOV();
     }
 
@@ -23,20 +24,35 @@ public class Player extends Creature {
         this.updateFOV();
     }
 
+    public void setLightSource(LightSource l) {
+        this.lightSource = l;
+    }
+
     /*
     Taken from SquidLib Library.
      */
     public void updateFOV() {
-        this.level.setTilesToNotVisible();
+        // this.level.setTilesToNotExplored();
         this.level.getTile(this.x, this.y).setToVisible();
         this.level.getTile(this.x, this.y).explore();
+        for (Tile t : this.level.getTiles(this.x, this.y, 3, false)) {
+            t.setToVisible();
+            t.explore();
+        }
+        // this.updateLightSource();
         for (int[] d : DIAGONALS) {
-            this.castLight(1, 1.0f, 0.0f, 0, d[0], d[1], 0);
-            this.castLight(1, 1.0f, 0.0f, d[0], 0, 0, d[1]);
+            this.castVision(1, 1.0f, 0.0f, 0, d[0], d[1], 0);
+            this.castVision(1, 1.0f, 0.0f, d[0], 0, 0, d[1]);
         }
     }
 
-    private void castLight(int row, float start, float end, int xx, int xy, int yx, int yy) {
+    private void updateLightSource() {
+        if (this.lightSource != null) {
+            this.lightSource.update();
+        }
+    }
+
+    private void castVision(int row, float start, float end, int xx, int xy, int yx, int yy) {
         float newStart = 0.0f;
         if (start < end) {
             return;
@@ -60,7 +76,7 @@ public class Player extends Creature {
                 //check if it's within the lightable area and light if needed
                 if (distanceFromPlayer(currentX, currentY) <= FOV_RADIUS) {
                     // float bright = (float) (1 - (distanceFromPlayer(deltaX, deltaY) / radius));
-                    this.level.getTile(currentX, currentY).setToVisible();
+                    // this.level.getTile(currentX, currentY).setToVisible();
                     this.level.getTile(currentX, currentY).explore();
 
                     if (blocked) { //previous cell was a blocking one
@@ -74,7 +90,7 @@ public class Player extends Creature {
                     } else {
                         if (!this.level.getTile(currentX, currentY).isTransparent() && distance < FOV_RADIUS) {//hit a wall within sight line
                             blocked = true;
-                            castLight(distance + 1, start, leftSlope, xx, xy, yx, yy);
+                            castVision(distance + 1, start, leftSlope, xx, xy, yx, yy);
                             newStart = rightSlope;
                         }
                     }

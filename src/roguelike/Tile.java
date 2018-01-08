@@ -13,7 +13,7 @@ public class Tile {
     private static final Color DEFAULT_EXPLORED_BACKGROUND = Color.DARK_GRAY;
     private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.LIGHT_GRAY;
     private static final Color DEFAULT_VISIBLE_FOREGROUND = Color.RED;
-    private static final Color DEFAULT_VISIBLE_BACKGROUND = Color.YELLOW;
+    private static final Color DEFAULT_VISIBLE_BACKGROUND = Color.GREEN;
         private static final Color DEFAULT_UNEXPLORED_FOREGROUND = Color.BLACK;
     private static final Color DEFAULT_UNEXPLORED_BACKGROUND = Color.BLACK;
     private static final boolean DEFAULT_WALKABLE = true;
@@ -21,10 +21,10 @@ public class Tile {
 
     private char curChar;
     private Color curForeground;
-    // the foreground color of whatever object or creature is present
+    // the foreground color of whatever object or actor is present
     private Color curBackground;
 
-    private Creature creature;
+    private Actor actor;
     private GameObject gameObject;
 
     private boolean walkable = true;
@@ -51,21 +51,21 @@ public class Tile {
         return this.curChar;
     }
 
-    public Creature getCreature() {
-        return creature;
+    public Actor getActor() {
+        return actor;
     }
 
-    public void setCreature(Creature creature) {
-        this.creature = creature;
+    public void setActor(Actor actor) {
+        this.actor = actor;
         this.updateGraphic();
     }
 
-    public boolean hasCreature() {
-        return (this.creature != null);
+    public boolean hasActor() {
+        return (this.actor != null);
     }
 
-    public void removeCreature() {
-        this.creature = null;
+    public void removeActor() {
+        this.actor = null;
         this.updateGraphic();
     }
 
@@ -116,6 +116,11 @@ public class Tile {
         this.updateGraphic();
     }
 
+    public void setToNotExplored() {
+        this.explored = false;
+        this.updateGraphic();
+    }
+
     public int getX() {
         return x;
     }
@@ -147,39 +152,71 @@ public class Tile {
         this.updateGraphic();
     }
 
+
     private void updateGraphic() {
-        // FIXME fix colors and stuff
-        if (!this.explored) {
-            this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
-            this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
-            this.curChar = DEFAULT_CHAR;
-        } else if (this.hasCreature()) {
-            this.curChar = this.creature.getCharacter();
-            if (this.visible) {
-                this.curForeground = this.creature.getForeground();
-                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
-            } else {
-                this.curForeground = this.creature.getForeground().darker();
-                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
-            }
+        if (this.hasActor()) {
+            this.curChar = this.actor.getCharacter();
         } else if (this.hasGameObject()) {
             this.curChar = this.gameObject.getCharacter();
-            if (this.visible) {
-                this.curForeground = this.gameObject.getForeground();
-                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
-            } else {
-                this.curForeground = this.gameObject.getForeground().darker();
-                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
-            }
-        } else if (this.visible){
-            this.curForeground = DEFAULT_VISIBLE_FOREGROUND;
-            this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
-            this.curChar = DEFAULT_CHAR;
         } else {
-            // explored but not visible
-            this.curForeground = DEFAULT_EXPLORED_FOREGROUND;
-            this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
             this.curChar = DEFAULT_CHAR;
         }
+
+        this.updateColorGraphic();
     }
+
+    private void updateColorGraphic() {
+        if (this.explored) {
+            if (this.visible) {
+                this.curForeground = DEFAULT_VISIBLE_FOREGROUND;
+                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+            } else {
+                this.curForeground = DEFAULT_EXPLORED_FOREGROUND;
+                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
+            }
+        } else {
+            this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
+            this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
+        }
+    }
+
+//    private void updateGraphic() {
+//        // FIXME fix colors and stuff
+//        if (!this.explored && !this.visible) {
+//            this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
+//            this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
+//            this.curChar = DEFAULT_CHAR;
+//        } else if (!this.explored) {
+//            this.curForeground = DEFAULT_UNEXPLORED_FOREGROUND;
+//            this.curBackground = DEFAULT_UNEXPLORED_BACKGROUND;
+//            this.curChar = DEFAULT_CHAR;
+//        } else if (this.hasCreature()) {
+//            this.curChar = this.actor.getCharacter();
+//            if (this.visible) {
+//                this.curForeground = this.actor.getForeground();
+//                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+//            } else {
+//                this.curForeground = this.actor.getForeground().darker();
+//                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
+//            }
+//        } else if (this.hasGameObject()) {
+//            this.curChar = this.gameObject.getCharacter();
+//            if (this.visible) {
+//                this.curForeground = this.gameObject.getForeground();
+//                this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+//            } else {
+//                this.curForeground = this.gameObject.getForeground().darker();
+//                this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
+//            }
+//        } else if (this.visible){
+//            this.curForeground = DEFAULT_VISIBLE_FOREGROUND;
+//            this.curBackground = DEFAULT_VISIBLE_BACKGROUND;
+//            this.curChar = DEFAULT_CHAR;
+//        } else {
+//            // explored but not visible
+//            this.curForeground = DEFAULT_EXPLORED_FOREGROUND;
+//            this.curBackground = DEFAULT_EXPLORED_BACKGROUND;
+//            this.curChar = DEFAULT_CHAR;
+//        }
+//    }
 }

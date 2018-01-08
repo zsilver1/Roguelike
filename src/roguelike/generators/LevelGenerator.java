@@ -1,12 +1,14 @@
 package roguelike.generators;
 
 import roguelike.Level;
+import roguelike.LightSource;
 import roguelike.Tile;
 import roguelike.Wall;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 
 public abstract class LevelGenerator {
 
@@ -16,11 +18,13 @@ public abstract class LevelGenerator {
     Level level;
     int startingPlayerX;
     int startingPlayerY;
+    LinkedList<LightSource> lightSources;
 
     LevelGenerator(int width, int height) {
         this.width = width;
         this.height = height;
         this.tiles = new Tile[this.width][this.height];
+        this.lightSources = new LinkedList<>();
     }
 
     LevelGenerator(int width, int height, Level level) {
@@ -113,5 +117,9 @@ public abstract class LevelGenerator {
 
     public int getStartingPlayerY() {
         return startingPlayerY;
+    }
+
+    public LinkedList<LightSource> getLightSources() {
+        return this.lightSources;
     }
 }

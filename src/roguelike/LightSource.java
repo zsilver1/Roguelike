@@ -1,7 +1,5 @@
 package roguelike;
 
-import java.util.ArrayDeque;
-
 public class LightSource {
     private static final int[][] DIAGONALS = {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
     private int x;
@@ -17,9 +15,24 @@ public class LightSource {
     }
 
     public void update() {
+        this.level.getTile(this.x, this.y).setToVisible();
 
+        for (int[] d : DIAGONALS) {
+            this.castLight(1, 1.0f, 0.0f, 0, d[0], d[1], 0);
+            this.castLight(1, 1.0f, 0.0f, d[0], 0, 0, d[1]);
+        }
     }
 
+    public void updateLocation(int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.update();
+    }
+
+
+    /*
+    Taken from SquidLib Library.
+    */
     private void castLight(int row, float start, float end, int xx, int xy, int yx, int yy) {
         float newStart = 0.0f;
         if (start < end) {
@@ -44,8 +57,8 @@ public class LightSource {
                 //check if it's within the lightable area and light if needed
                 if (distanceFromSource(currentX, currentY) <= this.radius) {
                     // float bright = (float) (1 - (distanceFromPlayer(deltaX, deltaY) / radius));
+                    // his.level.getTile(currentX, currentY).explore();
                     this.level.getTile(currentX, currentY).setToVisible();
-                    this.level.getTile(currentX, currentY).explore();
 
                     if (blocked) { //previous cell was a blocking one
                         if (!this.level.getTile(currentX, currentY).isTransparent()) {//hit a wall

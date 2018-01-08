@@ -61,7 +61,7 @@ x
 y
 illumination
 GameObject gameObject
-Creature creature
+Creature actor
 bool explored
 
 curChar
@@ -72,8 +72,8 @@ curBackground
 update:
 #+BEGIN_SRC python
   if explored:
-      if creature is present:
-          char = creature.char
+      if actor is present:
+          char = actor.char
       elif gameObject is present:
           char = gameObject.char
       else:
