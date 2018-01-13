@@ -10,10 +10,12 @@ public class Tile {
     public boolean marked;
 
     private static final char DEFAULT_CHAR = ' ';
-    private static final Color DEFAULT_EXPLORED_BACKGROUND = Color.DARK_GRAY;
-    private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.LIGHT_GRAY;
-    private static final Color DEFAULT_VISIBLE_FOREGROUND = Color.RED;
-    private static final Color DEFAULT_VISIBLE_BACKGROUND = Color.GREEN;
+    //private static final Color DEFAULT_EXPLORED_BACKGROUND = Color.DARK_GRAY;
+    //private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.LIGHT_GRAY;
+    private static final Color DEFAULT_EXPLORED_BACKGROUND = Color.BLACK;
+    private static final Color DEFAULT_EXPLORED_FOREGROUND = Color.BLACK;
+    private static final Color DEFAULT_VISIBLE_FOREGROUND = Color.LIGHT_GRAY.brighter();
+    private static final Color DEFAULT_VISIBLE_BACKGROUND = Color.BLUE.darker();
         private static final Color DEFAULT_UNEXPLORED_FOREGROUND = Color.BLACK;
     private static final Color DEFAULT_UNEXPLORED_BACKGROUND = Color.BLACK;
     private static final boolean DEFAULT_WALKABLE = true;
@@ -77,6 +79,7 @@ public class Tile {
         this.gameObject = gameObject;
         this.updateGraphic();
         this.walkable = this.gameObject.isWalkable();
+        this.transparent = this.gameObject.isTransparent();
 
     }
 

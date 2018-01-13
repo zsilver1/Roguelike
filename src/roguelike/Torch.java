@@ -4,7 +4,7 @@ import java.awt.Color;
 
 public class Torch extends GameObject {
 
-    private static final int RADIUS = 3;
+    private static final int RADIUS = 10;
     private LightSource lightSource;
     // private Level level;
 

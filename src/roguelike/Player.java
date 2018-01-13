@@ -82,7 +82,6 @@ public class Player extends Actor {
                     if (blocked) { //previous cell was a blocking one
                         if (!this.level.getTile(currentX, currentY).isTransparent()) {//hit a wall
                             newStart = rightSlope;
-                            // continue;
                         } else {
                             blocked = false;
                             start = newStart;
